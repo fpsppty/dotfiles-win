@@ -1,0 +1,285 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+  configurationVersion: 0.1.0
+  ########################################
+  ### ASSERTIONS: System Requirements
+  ########################################
+  assertions:
+    ### Assertion: OS Version
+    ### -------------------------------------
+    - resource: Microsoft.Windows.Developer/OsVersion
+      id: OsVersion
+      directives:
+        description: Minimum OS version requirement
+        allowPrerelease: true
+      settings:
+        MinVersion: "10.0.22000"
+  ########################################
+  ### System Configuration
+  ########################################
+  resources:
+    ### Enable: Developer Mode
+    - resource: Microsoft.Windows.Developer/DeveloperMode
+      directives:
+        description: Enable Developer Mode
+        allowPrerelease: true
+      settings:
+        Ensure: Present
+    ### Show file extensions and hidden files
+    - resource: Microsoft.Windows.Developer/WindowsExplorer
+      directives:
+        description: Show File Extensions and hidden files
+        allowPrerelease: true
+      settings:
+        FileExtensions: Show
+        HiddenFiles: Show
+    ### Set theme to Dark
+    - resource: Microsoft.Windows.Developer/EnableDarkMode
+      directives:
+        description: Set theme to Dark
+        allowPrerelease: true
+      settings:
+        Ensure: Present
+        RestartExplorer: true
+    ### Enable: Show Seconds in Clock
+    - resource: Microsoft.Windows.Developer/ShowSecondsInClock
+      directives:
+        description: Show seconds in clock
+        allowPrerelease: true
+      settings:
+        Ensure: Present
+        RestartExplorer: true
+    ### Enable: Long Paths Support
+    - resource: Microsoft.Windows.Developer/EnableLongPathSupport
+      directives:
+        description: Enable long path support
+        allowPrerelease: true
+      settings:
+        Ensure: Present
+    ########################################
+    ### Install Applications
+    ########################################
+    ### Install Git
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: git
+      directives:
+        description: Install Git
+        allowPrerelease: true
+      settings:
+        id: Git.Git
+        source: winget
+    ### Install GitHub CLI
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: gh
+      directives:
+        description: Install GitHub CLI
+        allowPrerelease: true
+      settings:
+        id: GitHub.cli
+        source: winget
+    ### Install Powershell
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Powershell Core
+        allowPrerelease: true
+      settings:
+        id: Microsoft.PowerShell
+        source: winget
+    ### Install Visual Studio Code
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: vscode
+      directives:
+        description: Install Microsoft Visual Studio Code
+        allowPrerelease: true
+      settings:
+        id: Microsoft.VisualStudioCode
+        ensure: Present
+        source: winget
+    ### Install PowerToys
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: powertoys
+      directives:
+        description: Install Microsoft.PowerToys
+        allowPrerelease: true
+      settings:
+        id: Microsoft.PowerToys
+        source: winget
+    ### Install Firefox
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install Mozilla.Firefox.DeveloperEdition
+        allowPrerelease: true
+      settings:
+        id: Mozilla.Firefox.DeveloperEdition.ja
+        source: winget
+    ### Install PeaZip
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      directives:
+        description: Install PeaZip
+        allowPrerelease: true
+      settings:
+        id: GiorgioTani.PeaZip
+        source: winget
+    ### Install Google Drive
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: GoogleDrive
+      directives:
+        description: Install Google Drive
+        allowPrerelease: true
+      settings:
+        id: Google.GoogleDrive
+        source: winget
+    ### Install Obsidian
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Obsidian
+      directives:
+        description: Install Obsidian
+        allowPrerelease: true
+      settings:
+        id: Obsidian.Obsidian
+        source: winget
+    ### Install Steam
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Steam
+      directives:
+        description: Install Steam
+        allowPrerelease: true
+      settings:
+        id: Valve.Steam
+        source: winget
+    ### Install Discord
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Discord
+      directives:
+        description: Install Discord
+        allowPrerelease: true
+      settings:
+        id: Discord.Discord
+        source: winget
+    ### Install Eartrumpet
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Eartrumpet
+      directives:
+        description: Install Eartrumpet
+        allowPrerelease: true
+      settings:
+        id: File-New-Project.EarTrumpet
+        source: winget
+    ### Install Bitwarden
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: Bitwarden
+      directives:
+        description: Install Bitwarden
+        allowPrerelease: true
+      settings:
+        id: Bitwarden.Bitwarden
+        source: winget
+    ### Install scoop
+    - resource: PSDscResources/Script
+      id: scoop
+      dependsOn:
+        - git
+      directives:
+        description: Install Scoop
+      settings:
+        GetScript: |
+          return $true
+        TestScript: |
+          return Test-Path "$env:USERPROFILE\scoop" -Type Container
+        SetScript: |
+          Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+          scoop update
+          scoop bucket add extras
+    ########################################
+    ### Configure settings
+    ########################################
+    ### Git Configure
+    - resource: PSDscResources/Script
+      dependsOn:
+        - git
+      directives:
+        description: Configure Git config
+      settings:
+        SetScript: |
+          git config --global user.name "fpsppty"
+          git config --global ghq.root "~/.ghq"
+        GetScript: return $false
+        TestScript: return $false
+    ### Git Configure Email
+    - resource: GitDsc/GitConfigUserEmail
+      directives:
+        description: Configure Git
+        allowPrerelease: true
+      dependsOn:
+        - git
+      settings:
+         UserEmail: "128275033+fpsppty@users.noreply.github.com"
+         ConfigLocation: "Global"
+    ### Configure PowerToys
+    - resource: Microsoft.PowerToys.Configure/PowerToysConfigure
+      dependsOn:
+        - powertoys
+      directives:
+        description: Configure PowerToys
+      settings:
+        AdvancedPaste:
+          Enabled: true
+        AlwaysOnTop:
+          Enabled: false
+        Awake:
+          Enabled: false
+        ColorPicker:
+          Enabled: false
+        CropAndLock:
+          Enabled: false
+        EnvironmentVariables:
+          Enabled: true
+        FancyZones:
+          Enabled: false
+        FileLocksmith:
+          Enabled: false
+        FindMyMouse:
+          Enabled: false
+        Hosts:
+          Enabled: true
+        ImageResizer:
+          Enabled: false
+        KeyboardManager:
+          Enabled: true
+          # TODO: Caps2Ctrl
+        MeasureTool:
+          Enabled: false
+        MouseHighlighter:
+          Enabled: false
+        MouseJump:
+          Enabled: false
+        MousePointerCrosshairs:
+          Enabled: false
+        MouseWithoutBorders:
+          Enabled: false
+        NewPlus:
+          Enabled: false
+        Peek:
+          Enabled: false
+        PowerAccent:
+          Enabled: false
+        PowerLauncher:
+          Enabled: true
+          OpenPowerLauncher: "Alt+Space"
+          IgnoreHotkeysInFullscreen: true
+          ClearInputOnLaunch: true
+        PowerOcr:
+          Enabled: false
+        PowerPreview:
+          Enabled: false
+        PowerRename:
+          Enabled: false
+        RegistryPreview:
+          Enabled: true
+          DefaultRegApp: true
+        ShortcutGuide:
+          Enabled: false
+        Workspaces:
+          Enabled: false
+        GeneralSettings:
+          Startup: true
