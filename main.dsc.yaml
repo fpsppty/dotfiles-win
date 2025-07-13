@@ -196,6 +196,30 @@ properties:
       settings:
          UserEmail: "128275033+fpsppty@users.noreply.github.com"
          ConfigLocation: "Global"
+    ### Git Clone dotfiles repository
+    - resource: GitDsc/GitClone
+      id: dotfiles
+      directives:
+        description: Clone dotfiles repository
+        allowPrerelease: true
+      dependsOn:
+        - git
+      settings:
+        HttpsUrl: https://github.com/fpsppty/dotfiles-win.git
+        RootDirectory: ~/
+    ### Rename dotfiles directory
+    - resource: PSDscResources/Script
+      id: RenameDotfiles
+      directives:
+        description: Rename dotfiles directory
+        allowPrerelease: true
+      dependsOn:
+        - dotfiles
+      settings:
+        SetScript: |
+          mv ~/dotfiles-win ~/.dotfiles
+        GetScript: return $false
+        TestScript: return $false
     ### Configure PowerToys
     - resource: Microsoft.PowerToys.Configure/PowerToysConfigure
       dependsOn:
