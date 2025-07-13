@@ -288,3 +288,22 @@ properties:
           Enabled: false
         GeneralSettings:
           Startup: true
+    - resource: PSDscResources/Script
+      id: SetXDGConfigHome
+      directives:
+        description: Set XDG_CONFIG_HOME environment variable
+      settings:
+        GetScript: |
+          # Check if the environment variable XDG_CONFIG_HOME is set
+          if ($env:XDG_CONFIG_HOME) {
+              Write-Output "XDG_CONFIG_HOME is already set to: $env:XDG_CONFIG_HOME"
+          } else {
+              Write-Output "XDG_CONFIG_HOME is not set."
+          }
+        TestScript: |
+          # Check if the environment variable is set to the desired value
+          return $env:XDG_CONFIG_HOME -eq "$env:USERPROFILE\.config"
+        SetScript: |
+          # Set the XDG_CONFIG_HOME environment variable
+          [System.Environment]::SetEnvironmentVariable('XDG_CONFIG_HOME', "$env:USERPROFILE\.config", [System.EnvironmentVariableTarget]::User)
+          Write-Output "XDG_CONFIG_HOME set to $env:USERPROFILE\.config"
