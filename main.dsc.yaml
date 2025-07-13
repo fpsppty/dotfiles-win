@@ -48,7 +48,6 @@ properties:
         allowPrerelease: true
       settings:
         Ensure: Present
-        RestartExplorer: true
     ### Enable: Long Paths Support
     - resource: Microsoft.Windows.Developer/EnableLongPathSupport
       directives:
@@ -174,37 +173,19 @@ properties:
       settings:
         id: Bitwarden.Bitwarden
         source: winget
-    ### Install scoop
-    - resource: PSDscResources/Script
-      id: scoop
-      dependsOn:
-        - git
-      directives:
-        description: Install Scoop
-      settings:
-        GetScript: |
-          return $true
-        TestScript: |
-          return Test-Path "$env:USERPROFILE\scoop" -Type Container
-        SetScript: |
-          Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-          scoop update
-          scoop bucket add extras
     ########################################
     ### Configure settings
     ########################################
-    ### Git Configure
-    - resource: PSDscResources/Script
+    ### Git Configure UserName
+    - resource: GitDsc/GitConfigUserName
+      directives:
+        description: Configure Git UserName
+        allowPrerelease: true
       dependsOn:
         - git
-      directives:
-        description: Configure Git config
       settings:
-        SetScript: |
-          git config --global user.name "fpsppty"
-          git config --global ghq.root "~/.ghq"
-        GetScript: return $false
-        TestScript: return $false
+         UserName: "fpsppty"
+         ConfigLocation: "Global"
     ### Git Configure Email
     - resource: GitDsc/GitConfigUserEmail
       directives:
