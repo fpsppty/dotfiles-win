@@ -41,13 +41,6 @@ properties:
       settings:
         Ensure: Present
         RestartExplorer: true
-    ### Enable: Show Seconds in Clock
-    - resource: Microsoft.Windows.Developer/ShowSecondsInClock
-      directives:
-        description: Show seconds in clock
-        allowPrerelease: true
-      settings:
-        Ensure: Present
     ### Enable: Long Paths Support
     - resource: Microsoft.Windows.Developer/EnableLongPathSupport
       directives:
