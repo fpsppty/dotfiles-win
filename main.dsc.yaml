@@ -69,6 +69,15 @@ properties:
       settings:
         id: GitHub.cli
         source: winget
+    ### Install GitHub CLI
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: chezmoi
+      directives:
+        description: Install chezmoi
+        allowPrerelease: true
+      settings:
+        id: twpayne.chezmoi
+        source: winget
     ### Install Powershell
     - resource: Microsoft.WinGet.DSC/WinGetPackage
       directives:
@@ -189,22 +198,6 @@ properties:
       settings:
          UserEmail: "128275033+fpsppty@users.noreply.github.com"
          ConfigLocation: "Global"
-    ### Rename dotfiles directory
-    - resource: PSDscResources/Script
-      id: dotfiles
-      directives:
-        description: Rename dotfiles directory
-        allowPrerelease: true
-      dependsOn:
-        - git
-      settings:
-        SetScript: |
-          git clone https://github.com/KitKat31337/homepsick.git "$([IO.Path]::Combine($home, ".homesick", "repos", "homepsick"))"
-          Import-Module -Name "$([IO.Path]::Combine($home, ".homesick", "repos", "homepsick", "src", "Homepsick.psm1"))" -Force
-          New-HomepsickCastle -Clone -GitUrl https://github.com/fpsppty/dotfiles-win
-          Enable-HomepsickCastle -All -Force
-        GetScript: return $false
-        TestScript: return $false
     ### Configure PowerToys
     - resource: Microsoft.PowerToys.Configure/PowerToysConfigure
       dependsOn:
