@@ -189,28 +189,20 @@ properties:
       settings:
          UserEmail: "128275033+fpsppty@users.noreply.github.com"
          ConfigLocation: "Global"
-    ### Git Clone dotfiles repository
-    - resource: GitDsc/GitClone
-      id: dotfiles
-      directives:
-        description: Clone dotfiles repository
-        allowPrerelease: true
-      dependsOn:
-        - git
-      settings:
-        HttpsUrl: https://github.com/fpsppty/dotfiles-win.git
-        RootDirectory: ~/
     ### Rename dotfiles directory
     - resource: PSDscResources/Script
-      id: RenameDotfiles
+      id: dotfiles
       directives:
         description: Rename dotfiles directory
         allowPrerelease: true
       dependsOn:
-        - dotfiles
+        - git
       settings:
         SetScript: |
-          mv ~/dotfiles-win ~/.dotfiles
+          git clone https://github.com/KitKat31337/homepsick.git "$([IO.Path]::Combine($home, ".homesick", "repos", "homepsick"))"
+          Import-Module -Name "$([IO.Path]::Combine($home, ".homesick", "repos", "homepsick", "src", "Homepsick.psm1"))" -Force
+          New-HomepsickCastle -Clone -GitUrl https://github.com/fpsppty/dotfiles-win
+          Enable-HomepsickCastle -All -Force
         GetScript: return $false
         TestScript: return $false
     ### Configure PowerToys
